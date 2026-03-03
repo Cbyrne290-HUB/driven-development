@@ -33,7 +33,6 @@ burger.addEventListener('click', () => {
   }
 });
 
-// Close menu when a link is clicked
 navLinks.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     navLinks.classList.remove('open');
@@ -45,10 +44,34 @@ navLinks.querySelectorAll('a').forEach(link => {
   });
 });
 
-// --- SCROLL REVEAL ANIMATIONS ---
-const revealElements = document.querySelectorAll(
-  '.service__card, .why__item, .testimonial__card, .work__item, .section__header'
-);
+// --- SCROLL REVEAL — STAGGERED ENTRANCE ---
+// Elements that fade + slide up individually
+const revealSelectors = [
+  '.service__card',
+  '.why__item',
+  '.testimonial__card',
+  '.work__item',
+  '.section__header',
+  '.value__card',
+  '.process__step',
+  '.stat__card',
+  '.project__card',
+  '.testimonial-stat',
+  '.practice__card',
+  '.careers-why__card',
+  '.role__card',
+  '.contact-method__card',
+  '.about-story__right',
+  '.service-detail__left',
+  '.service-detail__right',
+  '.why__left',
+  '.why__right',
+  '.footer__brand',
+  '.footer__links',
+  '.footer__contact'
+];
+
+const revealElements = document.querySelectorAll(revealSelectors.join(', '));
 
 revealElements.forEach(el => {
   el.classList.add('reveal');
@@ -64,7 +87,7 @@ const revealObserver = new IntersectionObserver((entries) => {
     }
   });
 }, {
-  threshold: 0.1,
+  threshold: 0.08,
   rootMargin: '0px 0px -40px 0px'
 });
 
@@ -72,8 +95,103 @@ revealElements.forEach(el => {
   revealObserver.observe(el);
 });
 
-// --- SMOOTH HOVER TILT ON SERVICE CARDS ---
-document.querySelectorAll('.service__card').forEach(card => {
+// --- SCROLL REVEAL — SECTION HEADINGS (slide in from left) ---
+const headingElements = document.querySelectorAll(
+  '.page-hero__title, .about-story__title, .service-detail__title, .cta-banner__inner h2'
+);
+
+headingElements.forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateX(-30px)';
+  el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+});
+
+const headingObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateX(0)';
+      headingObserver.unobserve(entry.target);
+    }
+  });
+}, {
+  threshold: 0.1
+});
+
+headingElements.forEach(el => headingObserver.observe(el));
+
+// --- PARALLAX ON HERO GLOW ---
+const heroGlow = document.querySelector('.hero__glow');
+const heroVisual = document.querySelector('.hero__visual');
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  if (heroGlow) {
+    heroGlow.style.transform = `translate(-50%, calc(-50% + ${scrollY * 0.15}px))`;
+  }
+  if (heroVisual) {
+    heroVisual.style.transform = `translateY(${scrollY * 0.08}px)`;
+  }
+});
+
+// --- PARALLAX ON IMAGE BREAKS ---
+document.querySelectorAll('.img-break img').forEach(img => {
+  window.addEventListener('scroll', () => {
+    const rect = img.closest('.img-break').getBoundingClientRect();
+    const scrolled = -rect.top * 0.2;
+    img.style.transform = `translateY(${scrolled}px) scale(1.1)`;
+  });
+});
+
+// --- COUNTER ANIMATION ON STATS ---
+function animateCounter(el) {
+  const target = el.innerText;
+  const isPercent = target.includes('%');
+  const isPlus = target.includes('+');
+  const isInfinity = target.includes('∞');
+  const hasSlash = target.includes('/');
+  const hashr = target.includes('hr');
+
+  if (isInfinity || hasSlash) return; // skip symbols
+
+  const num = parseFloat(target.replace(/[^0-9.]/g, ''));
+  if (isNaN(num)) return;
+
+  const duration = 1800;
+  const steps = 60;
+  const increment = num / steps;
+  let current = 0;
+  let step = 0;
+
+  el.innerText = '0' + (isPercent ? '%' : isPlus ? '+' : hashr ? 'hr' : '');
+
+  const timer = setInterval(() => {
+    step++;
+    current += increment;
+    if (step >= steps) {
+      current = num;
+      clearInterval(timer);
+    }
+    const display = Number.isInteger(num) ? Math.floor(current) : current.toFixed(1);
+    el.innerText = display + (isPercent ? '%' : isPlus ? '+' : hashr ? 'hr' : '');
+  }, duration / steps);
+}
+
+const statNums = document.querySelectorAll('.stat__num, .testimonial-stat__num');
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCounter(entry.target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+statNums.forEach(el => counterObserver.observe(el));
+
+// --- SMOOTH HOVER TILT ON CARDS ---
+document.querySelectorAll('.service__card, .project__card, .value__card, .testimonial__card').forEach(card => {
   card.addEventListener('mousemove', (e) => {
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -118,19 +236,8 @@ document.addEventListener('mouseenter', () => {
   cursor.style.opacity = '1';
 });
 
-// --- HERO HEADING WORD ANIMATION ON LOAD ---
+// --- HERO ENTRANCE ANIMATION ON LOAD ---
 window.addEventListener('load', () => {
-  const heading = document.querySelector('.hero__heading');
-  if (heading) {
-    heading.style.opacity = '0';
-    heading.style.transform = 'translateY(20px)';
-    heading.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-    setTimeout(() => {
-      heading.style.opacity = '1';
-      heading.style.transform = 'translateY(0)';
-    }, 200);
-  }
-
   const heroTag = document.querySelector('.hero__tag');
   if (heroTag) {
     heroTag.style.opacity = '0';
@@ -140,6 +247,17 @@ window.addEventListener('load', () => {
       heroTag.style.opacity = '1';
       heroTag.style.transform = 'translateY(0)';
     }, 100);
+  }
+
+  const heading = document.querySelector('.hero__heading');
+  if (heading) {
+    heading.style.opacity = '0';
+    heading.style.transform = 'translateY(20px)';
+    heading.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    setTimeout(() => {
+      heading.style.opacity = '1';
+      heading.style.transform = 'translateY(0)';
+    }, 200);
   }
 
   const heroSub = document.querySelector('.hero__sub');
@@ -163,17 +281,68 @@ window.addEventListener('load', () => {
       heroActions.style.transform = 'translateY(0)';
     }, 600);
   }
+
+  // Stagger hero cards
+  document.querySelectorAll('.hero__card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    setTimeout(() => {
+      card.style.opacity = '1';
+    }, 800 + (i * 200));
+  });
+
+  // Page hero for inner pages
+  const pageHeroTitle = document.querySelector('.page-hero__title');
+  if (pageHeroTitle) {
+    pageHeroTitle.style.opacity = '0';
+    pageHeroTitle.style.transform = 'translateY(20px)';
+    pageHeroTitle.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    setTimeout(() => {
+      pageHeroTitle.style.opacity = '1';
+      pageHeroTitle.style.transform = 'translateY(0)';
+    }, 200);
+  }
+
+  const pageHeroSub = document.querySelector('.page-hero__sub');
+  if (pageHeroSub) {
+    pageHeroSub.style.opacity = '0';
+    pageHeroSub.style.transform = 'translateY(10px)';
+    pageHeroSub.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    setTimeout(() => {
+      pageHeroSub.style.opacity = '1';
+      pageHeroSub.style.transform = 'translateY(0)';
+    }, 400);
+  }
 });
-```
 
-Once pasted, now we commit everything. Here's exactly what to do:
+// --- MARQUEE PAUSE ON HOVER ---
+const marqueeTrack = document.querySelector('.marquee__track');
+if (marqueeTrack) {
+  marqueeTrack.addEventListener('mouseenter', () => {
+    marqueeTrack.style.animationPlayState = 'paused';
+  });
+  marqueeTrack.addEventListener('mouseleave', () => {
+    marqueeTrack.style.animationPlayState = 'running';
+  });
+}
 
-Open the terminal at the bottom of your Codespace (it should already be open, you can see it in your screenshot). Type these commands one at a time and hit enter after each:
-```
-git add .
-```
-```
-git commit -m "Initial commit — homepage HTML, CSS and JS"
-```
-```
-git push
+// --- ACTIVE NAV LINK HIGHLIGHT ON SCROLL (homepage) ---
+const sections = document.querySelectorAll('section[id]');
+const navLinksList = document.querySelectorAll('.nav__links a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 120;
+    if (window.scrollY >= sectionTop) {
+      current = section.getAttribute('id');
+    }
+  });
+
+  navLinksList.forEach(link => {
+    link.classList.remove('nav__scroll-active');
+    if (link.getAttribute('href') === `#${current}`) {
+      link.classList.add('nav__scroll-active');
+    }
+  });
+});
