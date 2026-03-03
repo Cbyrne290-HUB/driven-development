@@ -332,10 +332,35 @@
    ABOUT PAGE
    ============================================ */
 .about-story__inner {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 80px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+}
+
+.about-story__right {
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-story__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  color: var(--snow);
+  margin: 12px 0 24px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.about-story__body {
+  font-size: 1rem;
+  color: rgba(248, 249, 250, 0.6);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  text-align: center;
 }
 
 .about-story__photo {
@@ -368,23 +393,6 @@
   color: rgba(248, 249, 250, 0.2);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.about-story__title {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
-  font-weight: 700;
-  color: var(--snow);
-  margin: 12px 0 24px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-
-.about-story__body {
-  font-size: 1rem;
-  color: rgba(248, 249, 250, 0.6);
-  line-height: 1.8;
-  margin-bottom: 16px;
 }
 
 .values__grid {
