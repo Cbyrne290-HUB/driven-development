@@ -664,8 +664,8 @@ img {
 }
 
 .testimonial__stars {
-  color: var(--cream);
-  font-size: 1rem;
+  color: #F5A623;  
+   font-size: 1rem;
   letter-spacing: 2px;
   margin-bottom: 16px;
 }
