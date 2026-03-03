@@ -938,3 +938,15 @@ img {
     right: 10px;
   }
 }
+
+/* --- WORK PREVIEW IMAGE FIX --- */
+.work__item {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+}
+
+.work__item:hover .work__overlay {
+  opacity: 1;
+}
